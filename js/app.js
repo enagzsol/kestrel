@@ -268,26 +268,6 @@
   setInterval(refreshUsdcSign, 60000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { refreshMarket(); refreshUsdcSign(); } });
 
-  // Translucent status bar + standalone: WebKit reports the viewport short by the top inset
-  // (bug 301108) although the web view reaches the home indicator. Size the page from the screen.
-  const sbMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-  const translucent = sbMeta && sbMeta.content === 'black-translucent';
-  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-  if (translucent && standalone && matchMedia('(max-width: 479px)').matches) {
-    document.body.classList.add('translucent');
-    const fitScreen = () => {
-      const h = screen.height;
-      const px = (innerHeight < h - 4 && innerWidth <= innerHeight) ? h + 'px' : '';
-      // grow the document itself too, so the web view has content to paint below the short layout viewport
-      document.documentElement.style.height = px;
-      document.body.style.height = px;
-      phone.style.height = px;
-    };
-    fitScreen();
-    addEventListener('resize', fitScreen);
-    addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
-  }
-
   // Diagnostics: tap the Bank row 5 times quickly to see viewport metrics on-device.
   let bankTaps = [];
   document.querySelector('.bank-row').addEventListener('click', () => {
@@ -311,45 +291,13 @@
       'screen:     ' + screen.width + ' x ' + screen.height,
       'visual:     ' + (vv ? Math.round(vv.width) + ' x ' + Math.round(vv.height) + ' @' + Math.round(vv.offsetTop) : 'n/a'),
       'phone box:  ' + Math.round(pb.width) + ' x ' + Math.round(pb.height) + ' @' + Math.round(pb.top),
-      'doc:        ' + document.documentElement.getBoundingClientRect().height + ' / ' + document.documentElement.scrollHeight,
       'safe top:   ' + cs.getPropertyValue('--safe-top').trim(),
       'safe btm:   ' + cs.getPropertyValue('--safe-bottom').trim(),
-      'status bar: ' + (sbMeta ? sbMeta.content : 'n/a'),
     ].join('\n');
     box.classList.add('show');
   });
 
-  // Launch intro: splash (1s) -> Dynamic Island Face ID (simulated) -> success -> reveal the app.
-  // Dev states freeze it: ?state=splash | faceid | facescan | faceok. Any other ?state, or ?intro=0, skips it.
-  const intro = $('intro'), faceid = $('faceid');
-  const params = new URLSearchParams(location.search);
-  const stateParam = params.get('state');
-  // iOS 26 paints the status bar strip with the page's background colour, so on the phone
-  // the page background follows the intro: purple splash, grey while Face ID is up, then black.
-  const isPhone = matchMedia('(max-width: 479px)').matches;
-  const setChrome = (color) => {
-    if (!isPhone) return;
-    document.documentElement.style.backgroundColor = color;
-    document.body.style.backgroundColor = color;
-  };
-  const runIntro = () => {
-    const t = (ms, fn) => setTimeout(fn, ms);
-    t(250, () => { intro.classList.remove('boot'); setChrome('#a294f1'); });
-    t(1000, () => { intro.classList.add('dim'); faceid.classList.add('show'); setChrome('#1d1c22'); });
-    t(2650, () => faceid.classList.add('scan'));
-    t(3400, () => faceid.classList.add('ok'));
-    t(4000, () => faceid.classList.add('hide'));
-    t(4250, () => { intro.classList.add('out'); setChrome('#000'); });
-    t(4750, () => intro.remove());
-  };
-  const freeze = { faceid: ['show'], facescan: ['show', 'scan'], faceok: ['show', 'scan', 'ok'] }[stateParam];
-  if (stateParam) intro.classList.remove('boot');
-  if (stateParam === 'splash') { /* stay on the splash */ }
-  else if (freeze) { intro.classList.add('dim'); faceid.classList.add(...freeze); setChrome('#1d1c22'); }
-  else if (stateParam || params.get('intro') === '0') intro.remove();
-  else runIntro();
-
-  // Dev helper: ?state=drawer|actions|sheet|bottom opens a given state on load.
+  // Dev helper: ?state=drawer|actions|sheet|bottom|perps opens a given state on load (and skips the intro).
   const state = new URLSearchParams(location.search).get('state');
   if (state === 'drawer') openDrawer();
   if (state === 'actions') actions.classList.add('open');

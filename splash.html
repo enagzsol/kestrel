@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Kestrel</title>
+  <meta name="apple-mobile-web-app-title" content="Kestrel">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/styles.css?v=13">
+  <meta name="theme-color" content="#a294f1">
+  <style>
+    /* iOS 26 paints the status bar strip with the page colour it samples at launch: purple here */
+    html, body { background: #a294f1; }
+    @media (min-width: 480px) { body { background: #0a0a0a; } }
+  </style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="intro" id="intro">
+    <img class="intro-ghost" src="assets/ghost.png" alt="">
+  </div>
+  <div class="status-bar">
+    <div class="island"></div>
+    <span class="status-time" id="statusTime">11:18</span>
+    <img class="status-icons" src="assets/status-icons.png" alt="">
+  </div>
+</div>
+<script>
+  (function () {
+    var el = document.getElementById('statusTime');
+    var tick = function () { var d = new Date(); el.textContent = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
+    tick(); setInterval(tick, 1000);
+  })();
+  // Warm the next page's assets, then move on after one second.
+  new Image().src = 'assets/apple-touch-icon.png';
+  fetch('faceid.html').catch(function () {});
+  var q = location.search;
+  setTimeout(function () { location.replace('faceid.html' + q); }, 1000);
+</script>
+</body>
+</html>

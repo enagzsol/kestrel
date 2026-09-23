@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Kestrel</title>
+  <meta name="apple-mobile-web-app-title" content="Kestrel">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/styles.css?v=13">
+  <meta name="theme-color" content="#1d1c22">
+  <style>
+    /* sampled for the status bar strip: the system's Face ID dimming grey */
+    html, body { background: #1d1c22; }
+    @media (min-width: 480px) { body { background: #0a0a0a; } }
+  </style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="intro dim" id="intro">
+    <div class="intro-dim"></div>
+    <div class="faceid" id="faceid">
+      <div class="island-card">
+        <svg class="fid-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 30 V20 a12 12 0 0 1 12 -12 H30"/>
+          <path d="M70 8 H80 a12 12 0 0 1 12 12 V30"/>
+          <path d="M92 70 V80 a12 12 0 0 1 -12 12 H70"/>
+          <path d="M30 92 H20 a12 12 0 0 1 -12 -12 V70"/>
+          <g class="fid-face">
+            <path d="M34 36 V45"/>
+            <path d="M66 36 V45"/>
+            <path d="M51 36 V56 a5 5 0 0 1 -5 5"/>
+            <path d="M34 68 q16 13 32 0"/>
+          </g>
+        </svg>
+        <svg class="fid-ring" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="50" cy="50" r="44"/>
+          <line class="fid-hand" x1="50" y1="6" x2="50" y2="94"/>
+          <path class="fid-tick" d="M29 51 L44 66 L72 36"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <div class="island"></div>
+    <span class="status-time" id="statusTime">11:18</span>
+    <img class="status-icons" src="assets/status-icons.png" alt="">
+  </div>
+</div>
+<script>
+  (function () {
+    var el = document.getElementById('statusTime');
+    var tick = function () { var d = new Date(); el.textContent = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
+    tick(); setInterval(tick, 1000);
+  })();
+  // Dynamic Island Face ID: show -> scan -> ok -> hide -> home. ?state=faceid|facescan|faceok freezes a step.
+  var faceid = document.getElementById('faceid');
+  var params = new URLSearchParams(location.search);
+  var freeze = { faceid: ['show'], facescan: ['show', 'scan'], faceok: ['show', 'scan', 'ok'] }[params.get('state')];
+  if (freeze) {
+    freeze.forEach(function (c) { faceid.classList.add(c); });
+  } else {
+    var t = function (ms, fn) { setTimeout(fn, ms); };
+    t(120,  function () { faceid.classList.add('show'); });
+    t(1750, function () { faceid.classList.add('scan'); });
+    t(2500, function () { faceid.classList.add('ok'); });
+    t(3100, function () { faceid.classList.add('hide'); });
+    t(3400, function () {
+      try { sessionStorage.setItem('kestrel.booted', '1'); } catch (e) {}
+      location.replace('index.html');
+    });
+  }
+</script>
+</body>
+</html>

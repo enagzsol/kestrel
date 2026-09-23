@@ -12,10 +12,14 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/styles.css?v=12">
+  <link rel="stylesheet" href="css/styles.css?v=13">
+  <script>
+    // The intro lives on its own pages so iOS 26 samples the right status bar colour for each one.
+    try { if (!location.search && !sessionStorage.getItem("kestrel.booted")) location.replace("splash.html"); } catch (e) {}
+  </script>
 </head>
 <body>
-<div class="phone" id="phone">
+<div class="phone arrive" id="phone">
 
   <!-- ===== Main page (slides right when the drawer opens) ===== -->
   <div class="page" id="page">
@@ -245,33 +249,6 @@
     </div>
   </aside>
 
-  <!-- ===== Launch intro: splash, then simulated Face ID, then the app ===== -->
-  <div class="intro boot" id="intro">
-    <img class="intro-ghost" src="assets/ghost.png" alt="">
-    <div class="intro-dim"></div>
-    <div class="faceid" id="faceid">
-      <div class="island-card">
-        <svg class="fid-glyph" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 30 V20 a12 12 0 0 1 12 -12 H30"/>
-          <path d="M70 8 H80 a12 12 0 0 1 12 12 V30"/>
-          <path d="M92 70 V80 a12 12 0 0 1 -12 12 H70"/>
-          <path d="M30 92 H20 a12 12 0 0 1 -12 -12 V70"/>
-          <g class="fid-face">
-            <path d="M34 36 V45"/>
-            <path d="M66 36 V45"/>
-            <path d="M51 36 V56 a5 5 0 0 1 -5 5"/>
-            <path d="M34 68 q16 13 32 0"/>
-          </g>
-        </svg>
-        <svg class="fid-ring" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="50" cy="50" r="44"/>
-          <line class="fid-hand" x1="50" y1="6" x2="50" y2="94"/>
-          <path class="fid-tick" d="M29 51 L44 66 L72 36"/>
-        </svg>
-      </div>
-    </div>
-  </div>
-
   <!-- Status bar sits above everything, like the system one. Hidden when installed to the home screen. -->
   <div class="status-bar">
     <div class="island"></div>
@@ -280,6 +257,6 @@
   </div>
 
 </div>
-<script src="js/app.js?v=12"></script>
+<script src="js/app.js?v=13"></script>
 </body>
 </html>
