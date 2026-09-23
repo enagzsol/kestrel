@@ -387,7 +387,7 @@ input { font: inherit; color: inherit; font-variation-settings: inherit; }
 
 /* System-style dimming while Face ID is up */
 .intro-dim {
-  position: absolute; inset: 0; background: #1d1c22; opacity: 0;
+  position: absolute; inset: 0; background: #000; opacity: 0;
   transition: opacity .35s var(--ease);
 }
 .intro.dim .intro-dim { opacity: 1; }
