@@ -311,7 +311,7 @@
   if (stateParam === 'splash') { /* stay on the splash */ }
   else if (stateParam === 'faceid') faceid.classList.add('show');
   else if (stateParam === 'faceok') faceid.classList.add('show', 'ok');
-  else if (stateParam) intro.remove();
+  else if (stateParam || new URLSearchParams(location.search).get('intro') === '0') intro.remove();
   else runIntro();
 
   // Dev helper: ?state=drawer|actions|sheet|bottom opens a given state on load.
