@@ -6,11 +6,11 @@ Pixel-measured clone of a crypto wallet home screen at iPhone 16 Pro size (402 x
 
 Serve the folder over HTTP (the font and price APIs need a real origin):
 
-    python3 serve.py 8765
+    python3 serve.py 8766
 
 (`serve.py` is a plain static server that adds no-cache headers so the iPhone always loads the latest files.)
 
-Then open http://localhost:8765 on your Mac, or http://<your-mac-ip>:8765 on your iPhone
+Then open http://localhost:8766 on your Mac, or http://<your-mac-ip>:8766 on your iPhone
 (add it to the Home Screen for a fullscreen, status-bar-free version).
 
 ## Features
