@@ -274,9 +274,14 @@
   const translucent = sbMeta && sbMeta.content === 'black-translucent';
   const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   if (translucent && standalone && matchMedia('(max-width: 479px)').matches) {
+    document.body.classList.add('translucent');
     const fitScreen = () => {
       const h = screen.height;
-      phone.style.height = (innerHeight < h - 4 && innerWidth <= innerHeight) ? h + 'px' : '';
+      const px = (innerHeight < h - 4 && innerWidth <= innerHeight) ? h + 'px' : '';
+      // grow the document itself too, so the web view has content to paint below the short layout viewport
+      document.documentElement.style.height = px;
+      document.body.style.height = px;
+      phone.style.height = px;
     };
     fitScreen();
     addEventListener('resize', fitScreen);
@@ -306,6 +311,7 @@
       'screen:     ' + screen.width + ' x ' + screen.height,
       'visual:     ' + (vv ? Math.round(vv.width) + ' x ' + Math.round(vv.height) + ' @' + Math.round(vv.offsetTop) : 'n/a'),
       'phone box:  ' + Math.round(pb.width) + ' x ' + Math.round(pb.height) + ' @' + Math.round(pb.top),
+      'doc:        ' + document.documentElement.getBoundingClientRect().height + ' / ' + document.documentElement.scrollHeight,
       'safe top:   ' + cs.getPropertyValue('--safe-top').trim(),
       'safe btm:   ' + cs.getPropertyValue('--safe-bottom').trim(),
       'status bar: ' + (sbMeta ? sbMeta.content : 'n/a'),
@@ -328,7 +334,7 @@
   };
   const runIntro = () => {
     const t = (ms, fn) => setTimeout(fn, ms);
-    t(300, () => setChrome('#a294f1'));
+    t(250, () => { intro.classList.remove('boot'); setChrome('#a294f1'); });
     t(1000, () => { intro.classList.add('dim'); faceid.classList.add('show'); setChrome('#1d1c22'); });
     t(2650, () => faceid.classList.add('scan'));
     t(3400, () => faceid.classList.add('ok'));
@@ -337,6 +343,7 @@
     t(4750, () => intro.remove());
   };
   const freeze = { faceid: ['show'], facescan: ['show', 'scan'], faceok: ['show', 'scan', 'ok'] }[stateParam];
+  if (stateParam) intro.classList.remove('boot');
   if (stateParam === 'splash') { /* stay on the splash */ }
   else if (freeze) { intro.classList.add('dim'); faceid.classList.add(...freeze); setChrome('#1d1c22'); }
   else if (stateParam || params.get('intro') === '0') intro.remove();

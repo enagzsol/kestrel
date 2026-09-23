@@ -380,7 +380,10 @@ input { font: inherit; color: inherit; font-variation-settings: inherit; }
   transition: opacity .45s var(--ease);
 }
 .intro.out { opacity: 0; pointer-events: none; }
-.intro-ghost { width: 136.3px; height: 113.7px; }
+/* First frames are black: iOS 26 samples the page colour at launch for the status bar strip */
+.intro.boot { background: #000; }
+.intro.boot .intro-ghost { opacity: 0; }
+.intro-ghost { width: 136.3px; height: 113.7px; transition: opacity .25s; }
 
 /* System-style dimming while Face ID is up */
 .intro-dim {
@@ -409,6 +412,9 @@ input { font: inherit; color: inherit; font-variation-settings: inherit; }
   /* translucent mode (page starts at the screen top): hang from the island at 11px;
      opaque mode (page starts below the status bar): hang from the top edge */
   .island-card { top: min(11px, calc(var(--safe-top) - 34px)); }
+  /* translucent mode: the page starts at the screen top, so grow the card up to the edge to cover the island */
+  .translucent .faceid.show .island-card { top: 0; height: 156px; }
+  .translucent .faceid.hide .island-card { top: 11px; height: 37px; }
 }
 
 .fid-glyph, .fid-ring {
