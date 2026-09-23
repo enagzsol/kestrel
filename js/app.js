@@ -302,18 +302,27 @@
   const intro = $('intro'), faceid = $('faceid');
   const params = new URLSearchParams(location.search);
   const stateParam = params.get('state');
+  // iOS 26 paints the status bar strip with the page's background colour, so on the phone
+  // the page background follows the intro: purple splash, grey while Face ID is up, then black.
+  const isPhone = matchMedia('(max-width: 479px)').matches;
+  const setChrome = (color) => {
+    if (!isPhone) return;
+    document.documentElement.style.backgroundColor = color;
+    document.body.style.backgroundColor = color;
+  };
   const runIntro = () => {
     const t = (ms, fn) => setTimeout(fn, ms);
-    t(1000, () => { intro.classList.add('dim'); faceid.classList.add('show'); });
+    t(300, () => setChrome('#a294f1'));
+    t(1000, () => { intro.classList.add('dim'); faceid.classList.add('show'); setChrome('#1d1c22'); });
     t(2650, () => faceid.classList.add('scan'));
     t(3400, () => faceid.classList.add('ok'));
     t(4000, () => faceid.classList.add('hide'));
-    t(4250, () => intro.classList.add('out'));
+    t(4250, () => { intro.classList.add('out'); setChrome('#000'); });
     t(4750, () => intro.remove());
   };
   const freeze = { faceid: ['show'], facescan: ['show', 'scan'], faceok: ['show', 'scan', 'ok'] }[stateParam];
   if (stateParam === 'splash') { /* stay on the splash */ }
-  else if (freeze) { intro.classList.add('dim'); faceid.classList.add(...freeze); }
+  else if (freeze) { intro.classList.add('dim'); faceid.classList.add(...freeze); setChrome('#1d1c22'); }
   else if (stateParam || params.get('intro') === '0') intro.remove();
   else runIntro();
 
