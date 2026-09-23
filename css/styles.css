@@ -372,7 +372,7 @@ input { font: inherit; color: inherit; font-variation-settings: inherit; }
 }
 .diag.show { display: block; }
 
-/* ---------- Launch intro: splash -> Face ID -> app ---------- */
+/* ---------- Launch intro: splash -> Dynamic Island Face ID -> app ---------- */
 .intro {
   position: absolute; inset: 0; z-index: 70;
   background: #a294f1;                       /* sampled from the Kestrel splash */
@@ -381,36 +381,55 @@ input { font: inherit; color: inherit; font-variation-settings: inherit; }
 }
 .intro.out { opacity: 0; pointer-events: none; }
 .intro-ghost { width: 136.3px; height: 113.7px; }
-.intro.no-intro { display: none; }
 
-.faceid {
-  position: absolute; left: 50%; top: 50%; width: 138px; height: 138px;
-  margin: -69px 0 0 -69px; border-radius: 30px;
-  background: rgba(30,30,30,.72); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
-  box-shadow: 0 10px 40px rgba(0,0,0,.25);
-  opacity: 0; transform: scale(.82); pointer-events: none;
-  transition: opacity .25s var(--ease), transform .35s var(--ease);
+/* System-style dimming while Face ID is up */
+.intro-dim {
+  position: absolute; inset: 0; background: #1d1c22; opacity: 0;
+  transition: opacity .35s var(--ease);
 }
-.faceid.show { opacity: 1; transform: none; }
-.faceid-glyph, .faceid-check { position: absolute; left: 33px; top: 22px; width: 72px; height: 72px; }
-.faceid-label { position: absolute; left: 0; right: 0; top: 102px; text-align: center; font-size: 14px; line-height: 18px; font-weight: 600; color: rgba(255,255,255,.85); }
+.intro.dim .intro-dim { opacity: 1; }
 
-/* Scanning: the face "looks around" like the system prompt */
-.faceid.show .faceid-face { transform-origin: 50px 50px; animation: faceid-look 1.3s var(--ease) both; }
-@keyframes faceid-look {
+/* Desktop frame only: draw the Dynamic Island in the fake status bar (126 x 37 at y 11) */
+.island { position: absolute; left: 138px; top: 11px; width: 126px; height: 37px; border-radius: 19px; background: #000; }
+
+/* The island swells into a card hanging from the top of the screen (measured 143 x 145 at y 10) */
+.faceid { position: absolute; inset: 0; pointer-events: none; }
+.island-card {
+  position: absolute; left: 50%; top: 11px; width: 126px; height: 37px; margin-left: -63px;
+  border-radius: 19px; background: #000; overflow: hidden; opacity: 0;
+  transition: width .45s var(--ease), height .45s var(--ease), margin-left .45s var(--ease),
+              border-radius .45s var(--ease), opacity .15s;
+  color: #84ee86;
+}
+.faceid.show .island-card { opacity: 1; width: 143px; height: 145px; margin-left: -71.5px; border-radius: 40px; }
+.faceid.hide .island-card { width: 126px; height: 37px; margin-left: -63px; border-radius: 19px; }
+.faceid.hide .fid-glyph, .faceid.hide .fid-ring { opacity: 0 !important; transition: opacity .12s; }
+/* On the phone the page starts below the real status bar, so the card hangs from the top edge instead */
+@media (max-width: 479px) {
+  .island-card { top: -34px; }
+}
+
+.fid-glyph, .fid-ring {
+  position: absolute; left: 50%; top: 50%; width: 66px; height: 66px; margin: -33px 0 0 -33px;
+  filter: drop-shadow(0 0 5px rgba(132,238,134,.75)) drop-shadow(0 0 14px rgba(132,238,134,.35));
+}
+.fid-glyph { opacity: 0; transform: scale(.7); transition: opacity .2s .25s, transform .35s .25s var(--ease); }
+.faceid.show .fid-glyph { opacity: 1; transform: none; }
+.faceid.show .fid-face { transform-origin: 50px 50px; animation: fid-look 1.25s .35s var(--ease) both; }
+@keyframes fid-look {
   0%   { transform: translateX(0) scale(1); }
   28%  { transform: translateX(-7px) scale(.96); }
   62%  { transform: translateX(7px) scale(.96); }
   100% { transform: translateX(0) scale(1); }
 }
-.faceid-glyph { transition: opacity .18s, transform .3s var(--ease); }
-.faceid.ok .faceid-glyph { opacity: 0; transform: scale(.7); }
-
-/* Success: the ring and tick draw themselves */
-.faceid-check { opacity: 0; }
-.faceid.ok .faceid-check { opacity: 1; transition: opacity .12s; }
-.faceid-ring { stroke-dasharray: 264; stroke-dashoffset: 264; }
-.faceid-tick { stroke-dasharray: 60; stroke-dashoffset: 60; }
-.faceid.ok .faceid-ring { animation: faceid-draw .4s var(--ease) forwards; }
-.faceid.ok .faceid-tick { animation: faceid-draw .3s .25s var(--ease) forwards; }
-@keyframes faceid-draw { to { stroke-dashoffset: 0; } }
+/* Scan: the glyph becomes a ring with a sweeping hand */
+.faceid.scan .fid-glyph { opacity: 0; transform: scale(.6); transition: opacity .15s, transform .25s var(--ease); }
+.fid-ring { opacity: 0; transform: scale(.6); transition: opacity .18s, transform .3s var(--ease); }
+.faceid.scan .fid-ring { opacity: 1; transform: none; }
+.fid-hand { transform-origin: 50px 50px; animation: fid-sweep .9s linear infinite; }
+@keyframes fid-sweep { from { transform: rotate(-30deg); } to { transform: rotate(330deg); } }
+.fid-tick { stroke-dasharray: 64; stroke-dashoffset: 64; }
+/* Success: the hand goes, the tick draws */
+.faceid.ok .fid-hand { opacity: 0; transition: opacity .12s; animation-play-state: paused; }
+.faceid.ok .fid-tick { animation: fid-draw .32s .1s var(--ease) forwards; }
+@keyframes fid-draw { to { stroke-dashoffset: 0; } }

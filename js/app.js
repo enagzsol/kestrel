@@ -297,21 +297,24 @@
     box.classList.add('show');
   });
 
-  // Launch intro: splash (1s) -> Face ID scan (simulated) -> success -> reveal the app.
-  // Dev states freeze it: ?state=splash | faceid | faceok. Any other ?state skips it.
+  // Launch intro: splash (1s) -> Dynamic Island Face ID (simulated) -> success -> reveal the app.
+  // Dev states freeze it: ?state=splash | faceid | facescan | faceok. Any other ?state, or ?intro=0, skips it.
   const intro = $('intro'), faceid = $('faceid');
-  const stateParam = new URLSearchParams(location.search).get('state');
+  const params = new URLSearchParams(location.search);
+  const stateParam = params.get('state');
   const runIntro = () => {
     const t = (ms, fn) => setTimeout(fn, ms);
-    t(1000, () => faceid.classList.add('show'));
-    t(2400, () => faceid.classList.add('ok'));
-    t(3150, () => intro.classList.add('out'));
-    t(3650, () => intro.remove());
+    t(1000, () => { intro.classList.add('dim'); faceid.classList.add('show'); });
+    t(2650, () => faceid.classList.add('scan'));
+    t(3400, () => faceid.classList.add('ok'));
+    t(4000, () => faceid.classList.add('hide'));
+    t(4250, () => intro.classList.add('out'));
+    t(4750, () => intro.remove());
   };
+  const freeze = { faceid: ['show'], facescan: ['show', 'scan'], faceok: ['show', 'scan', 'ok'] }[stateParam];
   if (stateParam === 'splash') { /* stay on the splash */ }
-  else if (stateParam === 'faceid') faceid.classList.add('show');
-  else if (stateParam === 'faceok') faceid.classList.add('show', 'ok');
-  else if (stateParam || new URLSearchParams(location.search).get('intro') === '0') intro.remove();
+  else if (freeze) { intro.classList.add('dim'); faceid.classList.add(...freeze); }
+  else if (stateParam || params.get('intro') === '0') intro.remove();
   else runIntro();
 
   // Dev helper: ?state=drawer|actions|sheet|bottom opens a given state on load.
