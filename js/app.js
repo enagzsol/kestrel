@@ -297,6 +297,23 @@
     box.classList.add('show');
   });
 
+  // Launch intro: splash (1s) -> Face ID scan (simulated) -> success -> reveal the app.
+  // Dev states freeze it: ?state=splash | faceid | faceok. Any other ?state skips it.
+  const intro = $('intro'), faceid = $('faceid');
+  const stateParam = new URLSearchParams(location.search).get('state');
+  const runIntro = () => {
+    const t = (ms, fn) => setTimeout(fn, ms);
+    t(1000, () => faceid.classList.add('show'));
+    t(2400, () => faceid.classList.add('ok'));
+    t(3150, () => intro.classList.add('out'));
+    t(3650, () => intro.remove());
+  };
+  if (stateParam === 'splash') { /* stay on the splash */ }
+  else if (stateParam === 'faceid') faceid.classList.add('show');
+  else if (stateParam === 'faceok') faceid.classList.add('show', 'ok');
+  else if (stateParam) intro.remove();
+  else runIntro();
+
   // Dev helper: ?state=drawer|actions|sheet|bottom opens a given state on load.
   const state = new URLSearchParams(location.search).get('state');
   if (state === 'drawer') openDrawer();

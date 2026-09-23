@@ -371,3 +371,46 @@ input { font: inherit; color: inherit; font-variation-settings: inherit; }
   font: 13px/18px ui-monospace, Menlo, monospace; white-space: pre; display: none;
 }
 .diag.show { display: block; }
+
+/* ---------- Launch intro: splash -> Face ID -> app ---------- */
+.intro {
+  position: absolute; inset: 0; z-index: 70;
+  background: #a294f1;                       /* sampled from the Kestrel splash */
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .45s var(--ease);
+}
+.intro.out { opacity: 0; pointer-events: none; }
+.intro-ghost { width: 136.3px; height: 113.7px; }
+.intro.no-intro { display: none; }
+
+.faceid {
+  position: absolute; left: 50%; top: 50%; width: 138px; height: 138px;
+  margin: -69px 0 0 -69px; border-radius: 30px;
+  background: rgba(30,30,30,.72); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0,0,0,.25);
+  opacity: 0; transform: scale(.82); pointer-events: none;
+  transition: opacity .25s var(--ease), transform .35s var(--ease);
+}
+.faceid.show { opacity: 1; transform: none; }
+.faceid-glyph, .faceid-check { position: absolute; left: 33px; top: 22px; width: 72px; height: 72px; }
+.faceid-label { position: absolute; left: 0; right: 0; top: 102px; text-align: center; font-size: 14px; line-height: 18px; font-weight: 600; color: rgba(255,255,255,.85); }
+
+/* Scanning: the face "looks around" like the system prompt */
+.faceid.show .faceid-face { transform-origin: 50px 50px; animation: faceid-look 1.3s var(--ease) both; }
+@keyframes faceid-look {
+  0%   { transform: translateX(0) scale(1); }
+  28%  { transform: translateX(-7px) scale(.96); }
+  62%  { transform: translateX(7px) scale(.96); }
+  100% { transform: translateX(0) scale(1); }
+}
+.faceid-glyph { transition: opacity .18s, transform .3s var(--ease); }
+.faceid.ok .faceid-glyph { opacity: 0; transform: scale(.7); }
+
+/* Success: the ring and tick draw themselves */
+.faceid-check { opacity: 0; }
+.faceid.ok .faceid-check { opacity: 1; transition: opacity .12s; }
+.faceid-ring { stroke-dasharray: 264; stroke-dashoffset: 264; }
+.faceid-tick { stroke-dasharray: 60; stroke-dashoffset: 60; }
+.faceid.ok .faceid-ring { animation: faceid-draw .4s var(--ease) forwards; }
+.faceid.ok .faceid-tick { animation: faceid-draw .3s .25s var(--ease) forwards; }
+@keyframes faceid-draw { to { stroke-dashoffset: 0; } }
