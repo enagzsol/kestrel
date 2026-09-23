@@ -406,7 +406,9 @@ input { font: inherit; color: inherit; font-variation-settings: inherit; }
 .faceid.hide .fid-glyph, .faceid.hide .fid-ring { opacity: 0 !important; transition: opacity .12s; }
 /* On the phone the page starts below the real status bar, so the card hangs from the top edge instead */
 @media (max-width: 479px) {
-  .island-card { top: -34px; }
+  /* translucent mode (page starts at the screen top): hang from the island at 11px;
+     opaque mode (page starts below the status bar): hang from the top edge */
+  .island-card { top: min(11px, calc(var(--safe-top) - 34px)); }
 }
 
 .fid-glyph, .fid-ring {

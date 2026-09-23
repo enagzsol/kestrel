@@ -268,6 +268,21 @@
   setInterval(refreshUsdcSign, 60000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { refreshMarket(); refreshUsdcSign(); } });
 
+  // Translucent status bar + standalone: WebKit reports the viewport short by the top inset
+  // (bug 301108) although the web view reaches the home indicator. Size the page from the screen.
+  const sbMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  const translucent = sbMeta && sbMeta.content === 'black-translucent';
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (translucent && standalone && matchMedia('(max-width: 479px)').matches) {
+    const fitScreen = () => {
+      const h = screen.height;
+      phone.style.height = (innerHeight < h - 4 && innerWidth <= innerHeight) ? h + 'px' : '';
+    };
+    fitScreen();
+    addEventListener('resize', fitScreen);
+    addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
+  }
+
   // Diagnostics: tap the Bank row 5 times quickly to see viewport metrics on-device.
   let bankTaps = [];
   document.querySelector('.bank-row').addEventListener('click', () => {
@@ -293,6 +308,7 @@
       'phone box:  ' + Math.round(pb.width) + ' x ' + Math.round(pb.height) + ' @' + Math.round(pb.top),
       'safe top:   ' + cs.getPropertyValue('--safe-top').trim(),
       'safe btm:   ' + cs.getPropertyValue('--safe-bottom').trim(),
+      'status bar: ' + (sbMeta ? sbMeta.content : 'n/a'),
     ].join('\n');
     box.classList.add('show');
   });
