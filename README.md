@@ -20,7 +20,8 @@ Then open http://localhost:8770 on your Mac, or http://<your-mac-ip>:8770 on you
 - SOL and USDC prices come from CoinGecko; perp 24h changes (BTC, ETH, ZEC, HYPE, CL)
   come from Hyperliquid. Everything refreshes every 30 seconds.
 - Tap the avatar for the side drawer, the + button for the action sheet.
-- Launch intro: `splash.html` (purple splash, 1s) -> `faceid.html` (Dynamic Island Face ID, simulated) -> home.
+- Launch intro: `splash.html` (purple splash, 1s) -> home. `faceid.html` (simulated Dynamic Island Face ID)
+  is parked and not in the flow; see the comment in `splash.html` to re-enable it.
   They are separate pages because iOS 26 samples each page's colour once for the status bar strip.
 - Add `?state=drawer|actions|sheet|bottom|perps` to the URL to open a state directly (skips the intro);
   `faceid.html?state=faceid|facescan|faceok` freezes a Face ID step.

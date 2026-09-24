@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/styles.css?v=16">
+  <link rel="stylesheet" href="css/styles.css?v=17">
   <meta name="theme-color" content="#a294f1">
   <style>
     /* iOS 26 paints the status bar strip with the page colour it samples at launch: purple here */
@@ -36,11 +36,13 @@
     var tick = function () { var d = new Date(); el.textContent = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
     tick(); setInterval(tick, 1000);
   })();
-  // Warm the next page's assets, then move on after one second.
-  new Image().src = 'assets/apple-touch-icon.png';
-  fetch('faceid.html').catch(function () {});
-  var q = location.search;
-  setTimeout(function () { location.replace('faceid.html' + q); }, 1000);
+  // After one second go straight to the home screen.
+  // (Face ID step parked: to bring it back, replace 'index.html' with 'faceid.html' + location.search
+  //  and drop the sessionStorage line; faceid.html sets the flag itself.)
+  setTimeout(function () {
+    try { sessionStorage.setItem('kestrel.booted', '1'); } catch (e) {}
+    location.replace('index.html');
+  }, 1000);
 </script>
 </body>
 </html>
