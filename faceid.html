@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/styles.css?v=15">
+  <link rel="stylesheet" href="css/styles.css?v=16">
   <meta name="theme-color" content="#000000">
   <style>
     /* sampled for the status bar strip: black, so the strip, the island and the card read as one shape */
@@ -65,11 +65,11 @@
     freeze.forEach(function (c) { faceid.classList.add(c); });
   } else {
     var t = function (ms, fn) { setTimeout(fn, ms); };
-    t(120,  function () { faceid.classList.add('show'); });
-    t(1750, function () { faceid.classList.add('scan'); });
-    t(2500, function () { faceid.classList.add('ok'); });
-    t(3100, function () { faceid.classList.add('hide'); });
-    t(3400, function () {
+    t(60,   function () { faceid.classList.add('show'); });
+    t(750,  function () { faceid.classList.add('scan'); });
+    t(1200, function () { faceid.classList.add('ok'); });
+    t(1600, function () { faceid.classList.add('hide'); });
+    t(1800, function () {
       try { sessionStorage.setItem('kestrel.booted', '1'); } catch (e) {}
       location.replace('index.html');
     });
