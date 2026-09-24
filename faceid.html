@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/styles.css?v=17">
+  <link rel="stylesheet" href="css/styles.css?v=18">
   <meta name="theme-color" content="#000000">
   <style>
     /* sampled for the status bar strip: black, so the strip, the island and the card read as one shape */
@@ -37,9 +37,13 @@
             <path d="M34 68 q16 13 32 0"/>
           </g>
         </svg>
-        <svg class="fid-ring" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="50" cy="50" r="44"/>
-          <line class="fid-hand" x1="50" y1="6" x2="50" y2="94"/>
+        <div class="fid-gyro">
+          <div class="fid-glow"></div>
+          <div class="fid-r fid-r1"></div>
+          <div class="fid-r fid-r2"></div>
+        </div>
+        <svg class="fid-check" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+          <circle class="fid-ring-ok" cx="50" cy="50" r="44"/>
           <path class="fid-tick" d="M29 51 L44 66 L72 36"/>
         </svg>
       </div>
