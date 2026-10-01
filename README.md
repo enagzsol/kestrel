@@ -15,10 +15,11 @@ Then open http://localhost:8770 on your Mac, or http://<your-mac-ip>:8770 on you
 
 ## Features
 
-- Tap the Cash card or any token row to edit SOL, USDC and cash amounts. Dollar values,
-  the daily +/- and the percentage are recalculated and saved in the browser.
-- SOL and USDC prices come from CoinGecko; perp 24h changes (BTC, ETH, ZEC, HYPE, CL)
-  come from Hyperliquid. Everything refreshes every 30 seconds.
+- Tap the Cash card or any token row to edit SOL, USDC, BTC, ETH, ZEC, HYPE and cash amounts.
+  Dollar values, the daily +/- and the percentage are recalculated and saved in the browser.
+  BTC, ETH, ZEC and HYPE rows appear once their amount is above zero; rows sort by value.
+- Token prices and perp 24h changes (BTC, ETH, ZEC, HYPE, CL) come from Hyperliquid; the
+  direction of USDC's daily move comes from CoinGecko. Everything refreshes every 30 seconds.
 - Tap the avatar for the side drawer, the + button for the action sheet.
 - Launch intro: `splash.html` (purple splash, 1s) -> home. `faceid.html` (simulated Dynamic Island Face ID)
   is parked and not in the flow; see the comment in `splash.html` to re-enable it.

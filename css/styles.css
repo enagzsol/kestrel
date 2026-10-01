@@ -173,6 +173,7 @@ input { font: inherit; color: inherit; font-variation-settings: inherit; }
 
 .token-list { margin-top: 13px; display: flex; flex-direction: column; gap: 8px; }
 .token { height: 68px; }
+.token[hidden] { display: none; }
 .token-icon { width: 40px; height: 40px; border-radius: 50%; flex: 0 0 40px; }
 .token-main { margin-left: 12px; display: flex; flex-direction: column; min-width: 0; }
 .token-name { font-size: 18px; line-height: 22px; font-weight: 600; white-space: nowrap; }
@@ -313,7 +314,9 @@ input { font: inherit; color: inherit; font-variation-settings: inherit; }
   display: flex; flex-direction: column; margin-top: 12px;
   background: var(--lev); border-radius: 16px; padding: 12px 16px 12px;
 }
-.field:first-of-type { margin-top: 20px; }
+.sheet-fields { margin-top: 20px; max-height: 372px; overflow-y: auto; border-radius: 16px; scrollbar-width: none; }
+.sheet-fields::-webkit-scrollbar { display: none; }
+.field:first-of-type { margin-top: 0; }
 .field-label { display: flex; align-items: center; gap: 8px; font-size: 15px; line-height: 20px; font-weight: 600; color: var(--text2); }
 .field-label img { width: 20px; height: 20px; border-radius: 50%; }
 .cash-mini { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }

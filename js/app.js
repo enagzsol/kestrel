@@ -8,10 +8,24 @@
   const LS_HOLDINGS = 'kestrel.holdings';
   const LS_MARKET = 'kestrel.market';
 
-  const DEFAULT_HOLDINGS = { sol: 0.04843, usdc: 3.65476, cash: 2 };
+  // Tokens priced from Hyperliquid marks. Optional ones only get a row once they are held.
+  const PRICED = [
+    { id: 'sol', sym: 'SOL' },
+    { id: 'btc', sym: 'BTC', optional: true },
+    { id: 'eth', sym: 'ETH', optional: true },
+    { id: 'zec', sym: 'ZEC', optional: true },
+    { id: 'hype', sym: 'HYPE', optional: true },
+  ];
+  const HOLDING_IDS = [...PRICED.map((t) => t.id), 'usdc', 'cash'];
+
+  const DEFAULT_HOLDINGS = { sol: 0.04843, btc: 0, eth: 0, zec: 0, hype: 0, usdc: 3.65476, cash: 2 };
   // Seed values so the first paint matches the screenshot before any fetch resolves.
   const DEFAULT_MARKET = {
     sol: { price: 117.28, pct: 0.18 },
+    btc: { price: 83889, pct: -0.52 },
+    eth: { price: 2693.2, pct: -0.36 },
+    zec: { price: 1389.9, pct: -5.4 },
+    hype: { price: 89.08, pct: 3.55 },
     usdcSign: -1,           // USDC is pegged 1:1; only the direction of its tiny daily move is shown
     perps: { BTC: -0.25, ETH: -0.53, ZEC: 7.95, HYPE: 0.26, CL: -0.15 },
     updated: 0,
@@ -72,14 +86,20 @@
   };
 
   const compute = () => {
-    const sol = tokenValue(holdings.sol, market.sol);
-    const usdc = { value: holdings.usdc, change: 0 };   // 1 USDC = 1 USD
-    const total = holdings.cash + sol.value + usdc.value;
-    const change = sol.change;
+    const tokens = { usdc: { value: holdings.usdc, change: 0 } };   // 1 USDC = 1 USD
+    let total = holdings.cash + holdings.usdc;
+    let change = 0;
+    for (const { id } of PRICED) {
+      tokens[id] = tokenValue(holdings[id], market[id]);
+      total += tokens[id].value;
+      change += tokens[id].change;
+    }
     const base = total - change;
     const pct = base > 0 ? (change / base) * 100 : 0;
-    return { sol, usdc, total, change, pct };
+    return { tokens, total, change, pct };
   };
+
+  const tokenRow = (id) => document.querySelector('.token[data-token="' + id + '"]');
 
   const render = () => {
     const p = compute();
@@ -88,13 +108,22 @@
     setSigned($('totalPct'), pctText(p.pct), p.change);
     $('cashUsd').textContent = money(holdings.cash);
 
-    $('solQty').textContent = qtyText(holdings.sol) + ' SOL';
-    $('solUsd').textContent = money(p.sol.value);
-    setSigned($('solChange'), tokenChangeText(p.sol.change), p.sol.change);
+    for (const { id, sym, optional } of PRICED) {
+      const t = p.tokens[id];
+      $(id + 'Qty').textContent = qtyText(holdings[id]) + ' ' + sym;
+      $(id + 'Usd').textContent = money(t.value);
+      setSigned($(id + 'Change'), tokenChangeText(t.change), t.change);
+      if (optional) tokenRow(id).hidden = !(holdings[id] > 0);
+    }
 
     $('usdcQty').textContent = qtyText(holdings.usdc) + ' USDC';
-    $('usdcUsd').textContent = money(p.usdc.value);
+    $('usdcUsd').textContent = money(p.tokens.usdc.value);
     setSigned($('usdcChange'), (market.usdcSign < 0 ? '-' : '+') + '<$0.01', market.usdcSign < 0 ? -1 : 1);
+
+    // Largest holding first, like the original.
+    Object.keys(p.tokens)
+      .sort((a, b) => p.tokens[b].value - p.tokens[a].value)
+      .forEach((id, i) => { tokenRow(id).style.order = i; });
 
     document.querySelectorAll('.perp[data-perp]').forEach((card) => {
       const pct = market.perps[card.dataset.perp];
@@ -133,7 +162,9 @@
       for (const sym of ['BTC', 'ETH', 'ZEC', 'HYPE']) {
         if (main.value[sym]) { market.perps[sym] = main.value[sym].pct; changed = true; }
       }
-      if (main.value.SOL) { market.sol = { price: main.value.SOL.price, pct: main.value.SOL.pct }; changed = true; }
+      for (const { id, sym } of PRICED) {
+        if (main.value[sym]) { market[id] = { price: main.value[sym].price, pct: main.value[sym].pct }; changed = true; }
+      }
     }
     if (xyz.status === 'fulfilled' && xyz.value['xyz:CL']) {
       market.perps.CL = xyz.value['xyz:CL'].pct; changed = true;
@@ -207,36 +238,37 @@
   /* ------------------------------------------------------------------ */
   /* Edit holdings sheet                                                 */
   /* ------------------------------------------------------------------ */
-  const inSol = $('inSol'), inUsdc = $('inUsdc'), inCash = $('inCash');
+  // Inputs are #inSol, #inBtc, ... with a matching #inSolUsd preview under each.
+  const inId = (id) => 'in' + id[0].toUpperCase() + id.slice(1);
+  const inputs = Object.fromEntries(HOLDING_IDS.map((id) => [id, $(inId(id))]));
   const parseNum = (s) => {
     const n = parseFloat(String(s).replace(/,/g, '.').replace(/[^0-9.]/g, ''));
     return Number.isFinite(n) && n >= 0 ? n : 0;
   };
   const previewSheet = () => {
-    const sol = tokenValue(parseNum(inSol.value), market.sol).value;
-    const usdc = parseNum(inUsdc.value);
-    const cash = parseNum(inCash.value);
-    $('inSolUsd').textContent = money(sol);
-    $('inUsdcUsd').textContent = money(usdc);
-    $('inCashUsd').textContent = money(cash);
-    $('inTotal').textContent = money(sol + usdc + cash);
+    let total = 0;
+    for (const id of HOLDING_IDS) {
+      const qty = parseNum(inputs[id].value);
+      const usd = market[id] && id !== 'usdc' ? tokenValue(qty, market[id]).value : qty;
+      $(inId(id) + 'Usd').textContent = money(usd);
+      total += usd;
+    }
+    $('inTotal').textContent = money(total);
   };
   const openSheet = (focus) => {
-    inSol.value = qtyText(holdings.sol);
-    inUsdc.value = qtyText(holdings.usdc);
-    inCash.value = holdings.cash.toFixed(2);
+    for (const id of HOLDING_IDS) inputs[id].value = id === 'cash' ? holdings.cash.toFixed(2) : qtyText(holdings[id]);
     previewSheet();
     phone.classList.add('sheet-open');
-    const el = { sol: inSol, usdc: inUsdc, cash: inCash }[focus];
+    const el = inputs[focus];
     if (el) setTimeout(() => { el.focus(); el.select(); }, 420);
   };
   const closeSheet = () => { phone.classList.remove('sheet-open'); document.activeElement && document.activeElement.blur(); };
 
   $('cashCard').addEventListener('click', () => openSheet('cash'));
   document.querySelectorAll('.token[data-token]').forEach((b) => b.addEventListener('click', () => openSheet(b.dataset.token)));
-  [inSol, inUsdc, inCash].forEach((i) => i.addEventListener('input', previewSheet));
+  Object.values(inputs).forEach((i) => i.addEventListener('input', previewSheet));
   $('sheetSave').addEventListener('click', () => {
-    holdings = { sol: parseNum(inSol.value), usdc: parseNum(inUsdc.value), cash: parseNum(inCash.value) };
+    holdings = Object.fromEntries(HOLDING_IDS.map((id) => [id, parseNum(inputs[id].value)]));
     save(LS_HOLDINGS, holdings);
     render();
     closeSheet();

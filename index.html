@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/styles.css?v=18">
+  <link rel="stylesheet" href="css/styles.css?v=19">
   <script>
     // The intro lives on its own pages so iOS 26 samples the right status bar colour for each one.
     try { if (!location.search && !sessionStorage.getItem("kestrel.booted")) location.replace("splash.html"); } catch (e) {}
@@ -87,6 +87,50 @@
             <span class="token-side">
               <span class="token-usd" id="usdcUsd">$3.65</span>
               <span class="token-change neg" id="usdcChange">-&lt;$0.01</span>
+            </span>
+          </button>
+          <button class="card token" data-token="btc" hidden>
+            <img class="token-icon" src="assets/btc.png" alt="">
+            <span class="token-main">
+              <span class="token-name">Bitcoin</span>
+              <span class="token-sub" id="btcQty">0 BTC</span>
+            </span>
+            <span class="token-side">
+              <span class="token-usd" id="btcUsd">$0.00</span>
+              <span class="token-change flat" id="btcChange">$0.00</span>
+            </span>
+          </button>
+          <button class="card token" data-token="eth" hidden>
+            <img class="token-icon" src="assets/eth.png" alt="">
+            <span class="token-main">
+              <span class="token-name">Ethereum</span>
+              <span class="token-sub" id="ethQty">0 ETH</span>
+            </span>
+            <span class="token-side">
+              <span class="token-usd" id="ethUsd">$0.00</span>
+              <span class="token-change flat" id="ethChange">$0.00</span>
+            </span>
+          </button>
+          <button class="card token" data-token="zec" hidden>
+            <img class="token-icon" src="assets/zec.png" alt="">
+            <span class="token-main">
+              <span class="token-name">Zcash</span>
+              <span class="token-sub" id="zecQty">0 ZEC</span>
+            </span>
+            <span class="token-side">
+              <span class="token-usd" id="zecUsd">$0.00</span>
+              <span class="token-change flat" id="zecChange">$0.00</span>
+            </span>
+          </button>
+          <button class="card token" data-token="hype" hidden>
+            <img class="token-icon" src="assets/hype.png" alt="">
+            <span class="token-main">
+              <span class="token-name">Hyperliquid</span>
+              <span class="token-sub" id="hypeQty">0 HYPE</span>
+            </span>
+            <span class="token-side">
+              <span class="token-usd" id="hypeUsd">$0.00</span>
+              <span class="token-change flat" id="hypeChange">$0.00</span>
             </span>
           </button>
         </div>
@@ -204,21 +248,43 @@
     <div class="sheet" id="sheet">
       <div class="grabber"></div>
       <div class="sheet-title">Edit holdings</div>
-      <label class="field">
-        <span class="field-label"><img src="assets/sol.png" alt="">Solana</span>
-        <span class="field-input"><input id="inSol" type="text" inputmode="decimal" autocomplete="off"><span class="unit">SOL</span></span>
-        <span class="field-usd" id="inSolUsd">$0.00</span>
-      </label>
-      <label class="field">
-        <span class="field-label"><img src="assets/usdc.png" alt="">USDC</span>
-        <span class="field-input"><input id="inUsdc" type="text" inputmode="decimal" autocomplete="off"><span class="unit">USDC</span></span>
-        <span class="field-usd" id="inUsdcUsd">$0.00</span>
-      </label>
-      <label class="field">
-        <span class="field-label"><span class="cash-mini"><img src="assets/cash.png" alt=""></span>Cash</span>
-        <span class="field-input"><span class="unit unit-lead">$</span><input id="inCash" type="text" inputmode="decimal" autocomplete="off"></span>
-        <span class="field-usd" id="inCashUsd">$0.00</span>
-      </label>
+      <div class="sheet-fields">
+        <label class="field">
+          <span class="field-label"><img src="assets/sol.png" alt="">Solana</span>
+          <span class="field-input"><input id="inSol" type="text" inputmode="decimal" autocomplete="off"><span class="unit">SOL</span></span>
+          <span class="field-usd" id="inSolUsd">$0.00</span>
+        </label>
+        <label class="field">
+          <span class="field-label"><img src="assets/usdc.png" alt="">USDC</span>
+          <span class="field-input"><input id="inUsdc" type="text" inputmode="decimal" autocomplete="off"><span class="unit">USDC</span></span>
+          <span class="field-usd" id="inUsdcUsd">$0.00</span>
+        </label>
+        <label class="field">
+          <span class="field-label"><img src="assets/btc.png" alt="">Bitcoin</span>
+          <span class="field-input"><input id="inBtc" type="text" inputmode="decimal" autocomplete="off"><span class="unit">BTC</span></span>
+          <span class="field-usd" id="inBtcUsd">$0.00</span>
+        </label>
+        <label class="field">
+          <span class="field-label"><img src="assets/eth.png" alt="">Ethereum</span>
+          <span class="field-input"><input id="inEth" type="text" inputmode="decimal" autocomplete="off"><span class="unit">ETH</span></span>
+          <span class="field-usd" id="inEthUsd">$0.00</span>
+        </label>
+        <label class="field">
+          <span class="field-label"><img src="assets/zec.png" alt="">Zcash</span>
+          <span class="field-input"><input id="inZec" type="text" inputmode="decimal" autocomplete="off"><span class="unit">ZEC</span></span>
+          <span class="field-usd" id="inZecUsd">$0.00</span>
+        </label>
+        <label class="field">
+          <span class="field-label"><img src="assets/hype.png" alt="">Hyperliquid</span>
+          <span class="field-input"><input id="inHype" type="text" inputmode="decimal" autocomplete="off"><span class="unit">HYPE</span></span>
+          <span class="field-usd" id="inHypeUsd">$0.00</span>
+        </label>
+        <label class="field">
+          <span class="field-label"><span class="cash-mini"><img src="assets/cash.png" alt=""></span>Cash</span>
+          <span class="field-input"><span class="unit unit-lead">$</span><input id="inCash" type="text" inputmode="decimal" autocomplete="off"></span>
+          <span class="field-usd" id="inCashUsd">$0.00</span>
+        </label>
+      </div>
       <div class="sheet-total"><span>Total</span><span id="inTotal">$0.00</span></div>
       <button class="btn-primary" id="sheetSave">Save</button>
       <button class="btn-secondary" id="sheetCancel">Cancel</button>
@@ -257,6 +323,6 @@
   </div>
 
 </div>
-<script src="js/app.js?v=18"></script>
+<script src="js/app.js?v=19"></script>
 </body>
 </html>
