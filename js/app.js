@@ -65,9 +65,9 @@
     const a = Math.abs(v);
     if (a === 0) return '$0.00';
     if (a < 0.005) return sign(v) + '<$0.01';
-    return sign(v) + '$' + a.toFixed(2);
+    return sign(v) + money(a);
   };
-  const pctText = (p) => (p === 0 ? '0.00%' : sign(p) + Math.abs(p).toFixed(2) + '%');
+  const pctText = (p) => (p === 0 ? '0.00%' : sign(p) + money(p).slice(1) + '%');
   const qtyText = (q) => q.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 5 });
   const setSigned = (el, text, v) => {
     el.textContent = text;
